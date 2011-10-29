@@ -1,6 +1,7 @@
 #include <linux/linkage.h> /* asmlinkage */
 #include <linux/kernel.h> /* printk */
 #include <linux/errno.h> /* EINVAL, EFAULT */
+#include <asm/uaccess.h> /* put_user */
 #include <linux/spinlock.h> /* read_lock, read_unlock */
 #include <linux/sched.h> /* task_struct, tasklist_lock */
 #include <linux/pid.h> /* find_task_by_vpid */
