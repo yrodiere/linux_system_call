@@ -344,10 +344,11 @@
 #define __NR_perf_event_open	336
 /* Custom system calls */
 #define __NR_helloworld	337
+#define __NR_getchildpids	338
 
 #ifdef __KERNEL__
 
-#define NR_syscalls 338
+#define NR_syscalls 339
 /* Modified to insert custom system calls; old value:
 #define NR_syscalls 337
 */

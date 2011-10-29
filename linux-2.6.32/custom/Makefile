@@ -1,2 +1,2 @@
-obj-y := sys_helloworld.o
+obj-y := sys_helloworld.o sys_getchildpids.o
 

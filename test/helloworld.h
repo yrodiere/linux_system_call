@@ -1,3 +1,5 @@
+#ifndef _HELLOWORLD_H
+#define _HELLOWORLD_H
 /*
 #include <sys/syscall.h>
 #include <linux/unistd.h>
@@ -13,4 +15,6 @@ int helloworld ( void )
 		"int	$0x80\n\t"
 		);
 }
+
+#endif /* _HELLOWORLD_H */
 
