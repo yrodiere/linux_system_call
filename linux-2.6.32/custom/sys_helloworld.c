@@ -6,7 +6,7 @@
 #include <linux/kernel.h>
 
 asmlinkage int sys_helloworld ( void ) {
-	printk(KERN EMERG "hello world!");
+	printk(KERN_EMERG "hello world!");
 	return 1;
 }
 
