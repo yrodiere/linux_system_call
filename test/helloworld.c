@@ -4,10 +4,8 @@
  */
 #include <stdlib.h>
 #include <linux/errno.h>
-#include <sys/syscall.h>
-#include <linux/unistd.h>
 
-_syscall0(int, helloworld);
+#include "helloworld.h"
 
 int main ( void )
 {
