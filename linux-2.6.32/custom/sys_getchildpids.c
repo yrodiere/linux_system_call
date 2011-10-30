@@ -1,5 +1,4 @@
 #include <linux/linkage.h> /* asmlinkage */
-#include <linux/kernel.h> /* printk */
 #include <linux/errno.h> /* EINVAL, EFAULT */
 #include <asm/uaccess.h> /* put_user */
 #include <linux/spinlock.h> /* read_lock, read_unlock */
@@ -10,7 +9,7 @@
 /* Get the pids of the children of a particular process.
  *
  * getchildpids() returns the pids of the children of the process whose pid is
- * <parent_pid> in <list>.
+ * <parent_pid> in <list>. The order is undefined.
  * The argument <size> should be set to the maximum number of items that can
  * be stored in the buffer pointed to by <list>.
  *
@@ -34,15 +33,12 @@ asmlinkage int sys_getchildpids ( pid_t parent_pid, int size, pid_t *list ) {
 	struct task_struct *child;
 	pid_t *current_out_pid;
 
-	printk(KERN_EMERG "Entering sys_getchildpids");
-
 	read_lock(&tasklist_lock);
 	parent = find_task_by_vpid(parent_pid);
 
 	if ( NULL == parent )
 	{
 		read_unlock(&tasklist_lock);
-		printk(KERN_EMERG "Leaving sys_getchildpids (invalid pid)");
 		return -EINVAL;
 	}
 
@@ -54,14 +50,12 @@ asmlinkage int sys_getchildpids ( pid_t parent_pid, int size, pid_t *list ) {
 		if ( (list + size) <= current_out_pid )
 		{
 			read_unlock(&tasklist_lock);
-			printk(KERN_EMERG "Leaving sys_getchildpids (list too small)");
 			return -EINVAL;
 		}
 
 		if ( 0 != put_user ( child->pid, current_out_pid ) )
 		{
 			read_unlock(&tasklist_lock);
-			printk(KERN_EMERG "Leaving sys_getchildpids (write error)");
 			return -EFAULT;
 		}
 
@@ -69,7 +63,6 @@ asmlinkage int sys_getchildpids ( pid_t parent_pid, int size, pid_t *list ) {
 	}
 
 	read_unlock(&tasklist_lock);
-	printk(KERN_EMERG "Leaving sys_getchildpids (OK)");
 	return (current_out_pid - list);
 }
 
