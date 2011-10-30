@@ -15,7 +15,6 @@ static int helloworld ( void )
 		"int	$0x80;"
 		: "=a" (res)
 		: "0" (337)
-		:
 		);
 	return res;
 }

@@ -15,7 +15,6 @@ static int getchildpids ( pid_t parent_pid, int size, pid_t list[] )
 		"int	$0x80;"
 		: "=a" (res)
 		: "0" (338), "b" ((long)parent_pid), "c" ((long)size), "d" ((long)list)
-		:
 		);
 	return res;
 }
