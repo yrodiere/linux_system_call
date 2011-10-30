@@ -42,8 +42,6 @@ asmlinkage int sys_getchildpids ( pid_t parent_pid, int size, pid_t *list ) {
 		return -EINVAL;
 	}
 
-	/* FIXME: do we really need tasklist_lock to browse the children? */
-	/* FIXME: can we use tasklist_lock along with put_user (which can sleep)? */
 	current_out_pid = list;
 	list_for_each_entry ( child, &(parent->children), sibling )
 	{
