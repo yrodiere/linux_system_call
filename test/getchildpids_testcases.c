@@ -8,18 +8,20 @@
 
 const char GLOBAL_SEPARATOR[] = "\n========================================\n";
 const char LOCAL_SEPARATOR[] = "\n----------------------------------------\n";
+
 const char INTERNAL_ERROR_PERROR_MSG[] = "ERROR: internal error in test function: ";
+const char OOM_MSG[] = "ERROR: out of memory.";
 
-const char NOMINAL_CASE_LABEL[] = "In this test, no error should occur.";
-const char INVALID_PPID_LABEL[] = "In this test, errno should be set to EINVAL.";
-const char ARRAY_TOO_SHORT_LABEL[] = "In this test, errno should be set to EINVAL.";
-const char INVALID_POINTER_LABEL[] = "In this test, errno should be set to EFAULT.";
+const char NOMINAL_CASE_LABEL[] = "NOMINAL CASE\nIn this test, no error should occur.";
+const char INVALID_PPID_LABEL[] = "INVALID PPID CASE\nIn this test, errno should be set to EINVAL.";
+const char ARRAY_TOO_SHORT_LABEL[] = "ARRAY TOO SHORT CASE\nIn this test, errno should be set to EINVAL.";
+const char INVALID_POINTER_LABEL[] = "INVALID POINTER CASE\nIn this test, errno should be set to EFAULT.";
 
 
-static void launchTestInEnv ( const char* description, unsigned int realChildCount,
-		pid_t syscallParameterParentPid, int syscallParameterChildCount )
+static void launchTestInEnv ( const char* description, size_t actualChildrenCount,
+		pid_t parentParameter, int sizeParameter, pid_t listParameter[] )
 {
-	pid_t *children = (pid_t*) malloc ( realChildCount * sizeof(pid_t) );
+	pid_t *actualChildren = (pid_t*) malloc ( actualChildrenCount * sizeof(pid_t) );
 	pid_t *forkedChild;
 	pid_t *deletedChild;
 
@@ -28,7 +30,8 @@ static void launchTestInEnv ( const char* description, unsigned int realChildCou
 	fputs ( LOCAL_SEPARATOR, stderr );
 
 	/* Fork every child */
-	for ( forkedChild = children ; forkedChild < (children + realChildCount)
+	for ( forkedChild = actualChildren
+			; forkedChild < (actualChildren + actualChildrenCount)
 			; ++forkedChild )
 	{
 		pid_t result = fork();
@@ -51,14 +54,14 @@ static void launchTestInEnv ( const char* description, unsigned int realChildCou
 		*forkedChild = result;
 	}
 
-	if ( forkedChild == (children + realChildCount) )
+	if ( forkedChild == (actualChildren + actualChildrenCount) )
 	{
-		getchildpids_test ( syscallParameterParentPid,
-				syscallParameterChildCount, children );
+		getchildpids_test ( actualChildrenCount, actualChildren,
+				parentParameter, sizeParameter, listParameter );
 	}
 
 	/* Kill every child */
-	for ( deletedChild = children ; deletedChild < forkedChild
+	for ( deletedChild = actualChildren ; deletedChild < forkedChild
 			; ++deletedChild )
 	{
 		/* Errors are more or less ignored here,
@@ -70,32 +73,59 @@ static void launchTestInEnv ( const char* description, unsigned int realChildCou
 		}
 	}
 
-	free ( children );
+	free ( actualChildren );
 }
 
-static void testNominalCase ( int childCount )
+static void testNominalCase ( size_t childCount )
 {
-	launchTestInEnv ( NOMINAL_CASE_LABEL,
-			childCount, getpid(), childCount );
+	pid_t *listParameter = (pid_t*) malloc(childCount * sizeof(pid_t));
+	if ( NULL == listParameter )
+	{
+		fputs ( OOM_MSG, stderr );
+		return;
+	}
+
+	launchTestInEnv ( NOMINAL_CASE_LABEL, childCount,
+			getpid(), childCount, listParameter );
+
+	free ( listParameter );
 }
 
-static void testBadPpidCase ( int childCount, pid_t badPpid )
+static void testBadPpidCase ( size_t childCount, pid_t badPpid )
 {
-	launchTestInEnv ( INVALID_PPID_LABEL,
-			childCount, badPpid, childCount );
+	pid_t *listParameter = (pid_t*) malloc(childCount * sizeof(pid_t));
+	if ( NULL == listParameter )
+	{
+		fputs ( OOM_MSG, stderr );
+		return;
+	}
+
+	launchTestInEnv ( INVALID_PPID_LABEL, childCount,
+			badPpid, childCount, listParameter );
+
+	free ( listParameter );
 }
 
-static void testArrayTooShortCase ( int childCount, int arraySizeDifference )
+static void testArrayTooShortCase ( size_t childCount, int arraySizeDifference )
 {
-	launchTestInEnv ( ARRAY_TOO_SHORT_LABEL,
-			childCount, getpid(), childCount + arraySizeDifference );
+	int sizeParameter = childCount + arraySizeDifference;
+	pid_t *listParameter = (pid_t*) malloc(sizeParameter * sizeof(pid_t));
+	if ( NULL == listParameter )
+	{
+		fputs ( OOM_MSG, stderr );
+		return;
+	}
+
+	launchTestInEnv ( ARRAY_TOO_SHORT_LABEL, childCount,
+			getpid(), sizeParameter, listParameter );
+
+	free ( listParameter );
 }
 
-/* TODO */
-static void testInvalidPointerCase ( int childCount, pid_t badPpid )
+static void testInvalidPointerCase ( size_t childCount, pid_t *invalidPointer )
 {
-	launchTestInEnv ( INVALID_POINTER_LABEL,
-			childCount, badPpid, childCount );
+	launchTestInEnv ( INVALID_POINTER_LABEL, childCount,
+			getpid(), childCount, invalidPointer );
 }
 
 
@@ -131,7 +161,12 @@ int main ( void )
 	testArrayTooShortCase ( 100, -100 );
 
 	/* Invalid pointer */
-	/* TODO */
+	testInvalidPointerCase ( 1, NULL );
+	testInvalidPointerCase ( 1, (pid_t*)&main );
+	testInvalidPointerCase ( 10, NULL );
+	testInvalidPointerCase ( 10, (pid_t*)&main );
+	testInvalidPointerCase ( 100, NULL );
+	testInvalidPointerCase ( 100, (pid_t*)&main );
 
 	return EXIT_SUCCESS;
 }
