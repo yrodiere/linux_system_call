@@ -8,12 +8,16 @@
  * _syscall0(int, helloworld);
  */
 
-int helloworld ( void )
+static int helloworld ( void )
 {
-	__asm__ (
-		"movl	$337,%eax\n\t"
-		"int	$0x80\n\t"
+	int res;
+	__asm__ __volatile__ (
+		"int	$0x80;"
+		: "=a" (res)
+		: "0" (337)
+		:
 		);
+	return res;
 }
 
 #endif /* _HELLOWORLD_H */
