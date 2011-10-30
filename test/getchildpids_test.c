@@ -83,11 +83,13 @@ int getchildpids_test ( pid_t parent, int trueChildrenCount,
 			|| 0 != memcmp ( trueChildren, syscallChildren, trueChildrenCount ) )
 	{
 		fputs ( CHILDREN_DIFFER_MSG, stderr );
+		free ( syscallChildren );
 		return 1;
 	}
 	else
 	{
 		fputs ( CHILDREN_SAME_MSG, stderr );
+		free ( syscallChildren );
 		return 0;
 	}
 }

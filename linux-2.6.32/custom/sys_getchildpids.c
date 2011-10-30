@@ -24,9 +24,9 @@
  * On error, -1 is returned, and errno is set appropriately.
  *
  * Errno values:
- *	- EFAULT	<list> has an invalid address, or there is no process
- *		associated with <parent_pid>.
- *	- EINVAL	<size> is less than the number of children.
+ *	- EFAULT	<list> has an invalid address.
+ *	- EINVAL	<size> is less than the number of children, or there is no
+ *		process associated with <parent_pid>.
  */
 asmlinkage int sys_getchildpids ( pid_t parent_pid, int size, pid_t *list ) {
 	struct task_struct *parent;

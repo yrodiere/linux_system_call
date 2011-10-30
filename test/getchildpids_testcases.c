@@ -8,8 +8,15 @@
 
 const char GLOBAL_SEPARATOR[] = "\n========================================\n";
 const char LOCAL_SEPARATOR[] = "\n----------------------------------------\n";
+const char INTERNAL_ERROR_PERROR_MSG[] = "ERROR: internal error in test function: ";
 
-static void launchTestInEnv ( char* description, unsigned int realChildCount,
+const char NOMINAL_CASE_LABEL[] = "In this test, no error should occur.";
+const char INVALID_PPID_LABEL[] = "In this test, errno should be set to EINVAL.";
+const char ARRAY_TOO_SHORT_LABEL[] = "In this test, errno should be set to EINVAL.";
+const char INVALID_POINTER_LABEL[] = "In this test, errno should be set to EFAULT.";
+
+
+static void launchTestInEnv ( const char* description, unsigned int realChildCount,
 		pid_t syscallParameterParentPid, int syscallParameterChildCount )
 {
 	pid_t *children = (pid_t*) malloc ( realChildCount * sizeof(pid_t) );
@@ -37,7 +44,7 @@ static void launchTestInEnv ( char* description, unsigned int realChildCount,
 		if ( result < 0 )
 		{
 			/* Exception: could not fork */
-			perror("ERROR: internal error in test function: ");
+			perror(INTERNAL_ERROR_PERROR_MSG);
 			break;
 		}
 
@@ -68,9 +75,29 @@ static void launchTestInEnv ( char* description, unsigned int realChildCount,
 
 static void testNominalCase ( int childCount )
 {
-	launchTestInEnv ( "In this test, no error should occur.",
+	launchTestInEnv ( NOMINAL_CASE_LABEL,
 			childCount, getpid(), childCount );
 }
+
+static void testBadPpidCase ( int childCount, pid_t badPpid )
+{
+	launchTestInEnv ( INVALID_PPID_LABEL,
+			childCount, badPpid, childCount );
+}
+
+static void testArrayTooShortCase ( int childCount, int arraySizeDifference )
+{
+	launchTestInEnv ( ARRAY_TOO_SHORT_LABEL,
+			childCount, getpid(), childCount + arraySizeDifference );
+}
+
+/* TODO */
+static void testInvalidPointerCase ( int childCount, pid_t badPpid )
+{
+	launchTestInEnv ( INVALID_POINTER_LABEL,
+			childCount, badPpid, childCount );
+}
+
 
 int main ( void )
 {
@@ -78,29 +105,33 @@ int main ( void )
 	 * TESTS WITH VALID PARAMETERS
 	 */
 
-	/* Test case 1: 0 child */
 	testNominalCase ( 0 );
-
-	/* Test case 2: 1 child */
 	testNominalCase ( 1 );
-
-	/* Test case 3: 10 children */
 	testNominalCase ( 10 );
-
-	/* Test case 4: 100 children */
 	testNominalCase ( 100 );
+
 
 	/*
 	 * TESTS WITH INVALID PARAMETERS
 	 */
 
-	/* TODO */
 	/* Incorrect pid */
-	/*
-	test ( 0, -1, 0 );
-	test ( 1, -1, 1 );
-	test ( 10, -1, 10 );
-	*/
+	testBadPpidCase ( 0, -1 );
+	testBadPpidCase ( 1, -1 );
+	testBadPpidCase ( 10, -1 );
+	testBadPpidCase ( 100, -1 );
+
+	/* Array too short */
+	testArrayTooShortCase ( 1, -1 );
+	testArrayTooShortCase ( 10, -1 );
+	testArrayTooShortCase ( 10, -5 );
+	testArrayTooShortCase ( 10, -10 );
+	testArrayTooShortCase ( 100, -1 );
+	testArrayTooShortCase ( 100, -50 );
+	testArrayTooShortCase ( 100, -100 );
+
+	/* Invalid pointer */
+	/* TODO */
 
 	return EXIT_SUCCESS;
 }
