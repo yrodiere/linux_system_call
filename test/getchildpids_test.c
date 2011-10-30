@@ -12,11 +12,12 @@ const char END_ARRAY = '}';
 
 /* Error messages */
 const char OOM_MSG[] = "ERROR: out of memory.";
-const char SYSCALL_FAILED_MSG[] = "ERROR: System call 'getchildpids' failed: ";
+const char SYSCALL_FAILED_MSG[] = "ERROR: System call 'getchildpids' failed with code [%d].";
+const char SYSCALL_FAILED_PERROR_MSG[] = "Error description";
 const char CHILDREN_DIFFER_MSG[] = "ERROR: The two lists are different.";
 
 /* Information messages */
-const char ACTUAL_CHILDREN_LABEL[] = "Actual process children: ";
+const char ACTUAL_CHILDREN_LABEL[] =  "Actual process children:       ";
 const char SYSCALL_CHILDREN_LABEL[] = "Children according to syscall: ";
 const char CHILDREN_SAME_MSG[] = "The two lists are the same.";
 
@@ -60,7 +61,8 @@ int getchildpids_test ( pid_t parent, int trueChildrenCount,
 	syscallChildrenCount = getchildpids ( parent, trueChildrenCount, syscallChildren );
 	if ( syscallChildrenCount < 0 )
 	{
-		perror ( SYSCALL_FAILED_MSG );
+		fprintf ( stderr, SYSCALL_FAILED_MSG, syscallChildrenCount );
+		perror ( SYSCALL_FAILED_PERROR_MSG );
 		free ( syscallChildren );
 		return -1;
 	}
