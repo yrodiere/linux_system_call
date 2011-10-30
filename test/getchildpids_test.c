@@ -12,14 +12,14 @@ const char END_ARRAY = '}';
 
 /* Error messages */
 const char OOM_MSG[] = "ERROR: out of memory.";
-const char SYSCALL_FAILED_MSG[] = "ERROR: System call 'getchildpids' failed with code [%d].";
+const char SYSCALL_FAILED_MSG[] = "ERROR: System call 'getchildpids' failed, returning error code [%d].\n";
 const char SYSCALL_FAILED_PERROR_MSG[] = "Error description";
 const char CHILDREN_DIFFER_MSG[] = "ERROR: The two lists are different.";
 
 /* Information messages */
 const char ACTUAL_CHILDREN_LABEL[] =  "Actual process children:       ";
 const char SYSCALL_CHILDREN_LABEL[] = "Children according to syscall: ";
-const char CHILDREN_SAME_MSG[] = "The two lists are the same.";
+const char CHILDREN_SAME_MSG[] = "The two lists are the same.\n";
 
 static int compare_pid_t ( const void * elem1, const void * elem2 )
 {
