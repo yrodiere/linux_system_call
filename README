@@ -4,10 +4,10 @@ This project consist in adding two system calls to the Linux kernel (v2.6.32):
 
 Structure
 =========
-  Modifications to the kernel are in linux-2.6.32/
-  Test files are in test/, and they are provided with a Makefile
+  * Modifications to the kernel are in linux-2.6.32/
+  * Test files are in test/, and they are provided with a Makefile
 
 How to use
 ==========
   Download the Linux 2.6.32 kernel sources, and copy all each file in linux-2.6.32
-  to the exact same subdirectory your Linux source tree.
+  to the exact same subdirectory in your Linux source tree.
