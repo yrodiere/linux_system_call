@@ -1,0 +1,13 @@
+This project consist in adding two system calls to the Linux kernel (v2.6.32):
+  * helloworld: a simple and useless helloworld
+  * getchildpids: see implementation in linux-2.6.32/custom/sys_getchildpids.c for documentation
+
+Structure
+=========
+  Modifications to the kernel are in linux-2.6.32/
+  Test files are in test/, and they are provided with a Makefile
+
+How to use
+==========
+  Download the Linux 2.6.32 kernel sources, and copy all each file in linux-2.6.32
+  to the exact same subdirectory your Linux source tree.
